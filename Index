@@ -1,0 +1,608 @@
+<title>Mapa de Evidencia</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    --bg:#f2f0e9; --surface:#fffdf9; --surface-2:#eae6da;
+    --ink:#201c16; --ink-2:#5d5748; --line:#ddd6c4;
+    --accent:#a9781f; --accent-deep:#7d5a17; --accent-soft:#f2e6c9;
+    --cat-a:#3b5166; --cat-a-soft:#e2e8ec;
+    --cat-b:#4a6741; --cat-b-soft:#e4ebe1;
+    --cat-c:#8a4a3a; --cat-c-soft:#f0e2dd;
+    --shadow: 0 1px 2px rgba(32,28,22,.06), 0 8px 24px -12px rgba(32,28,22,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#17140f; --surface:#201c15; --surface-2:#29241c;
+      --ink:#f1ece1; --ink-2:#b8ae99; --line:#3a3327;
+      --accent:#dab15a; --accent-deep:#e8c079; --accent-soft:#3a2f19;
+      --cat-a:#8aa8c2; --cat-a-soft:#232d36;
+      --cat-b:#9bbb8e; --cat-b-soft:#212b1e;
+      --cat-c:#d19483; --cat-c-soft:#2e211d;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#17140f; --surface:#201c15; --surface-2:#29241c;
+    --ink:#f1ece1; --ink-2:#b8ae99; --line:#3a3327;
+    --accent:#dab15a; --accent-deep:#e8c079; --accent-soft:#3a2f19;
+    --cat-a:#8aa8c2; --cat-a-soft:#232d36;
+    --cat-b:#9bbb8e; --cat-b-soft:#212b1e;
+    --cat-c:#d19483; --cat-c-soft:#2e211d;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Source Sans 3", system-ui, sans-serif;
+    font-size:16px; line-height:1.55; padding:0 18px;
+  }
+  a{color:var(--accent-deep);}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) a{color:var(--accent);} }
+  :root[data-theme="dark"] a{color:var(--accent);}
+
+  .wrap{max-width:780px; margin:0 auto;}
+
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:18px 0; }
+  .brand{ font-family:"Fraunces", serif; font-weight:600; font-size:1.05rem; text-decoration:none; color:var(--ink); display:flex; align-items:center; gap:8px; }
+  .brand .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent); }
+  .back{ font-size:14px; font-weight:600; text-decoration:none; }
+
+  header.hero{ padding:8px 0 28px; border-bottom:1px solid var(--line); }
+  .eyebrow{
+    font-family:"IBM Plex Mono", monospace; font-size:12px; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--accent-deep); margin:0 0 14px;
+  }
+  h1{
+    font-family:"Fraunces", serif; font-weight:600; font-size:clamp(2.1rem,6vw,3rem);
+    line-height:1.03; margin:0 0 16px; text-wrap:balance;
+  }
+  .lede{ max-width:60ch; color:var(--ink-2); font-size:1.06rem; margin:0 0 22px; }
+  .stats{ display:flex; flex-wrap:wrap; gap:10px 22px; font-family:"IBM Plex Mono", monospace; font-size:13px; color:var(--ink-2); }
+  .stats b{ color:var(--ink); font-weight:600; }
+  .report-link{
+    display:inline-flex; align-items:center; gap:8px; margin-top:22px;
+    font-size:14px; font-weight:600; text-decoration:none;
+    padding:9px 14px; border:1px solid var(--line); border-radius:8px; background:var(--surface);
+  }
+  .report-link:hover{ border-color:var(--accent); }
+
+  .toolbar{
+    position:sticky; top:env(safe-area-inset-top,0px); z-index:5;
+    background:var(--bg); padding:14px 0 12px; border-bottom:1px solid var(--line);
+    display:flex; flex-direction:column; gap:10px;
+  }
+  #search{
+    width:100%; padding:10px 14px; border-radius:8px; border:1px solid var(--line);
+    background:var(--surface); color:var(--ink); font-size:15px; font-family:inherit;
+  }
+  #search:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+  .pills{ display:flex; flex-wrap:wrap; gap:8px; }
+  .pill{
+    font-family:"IBM Plex Mono", monospace; font-size:12.5px; padding:7px 12px; border-radius:999px;
+    border:1px solid var(--line); background:var(--surface); color:var(--ink-2); cursor:pointer;
+  }
+  .pill[aria-pressed="true"]{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  :root[data-theme="dark"] .pill[aria-pressed="true"]{ background:var(--accent); color:#17140f; border-color:var(--accent); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .pill[aria-pressed="true"]{ background:var(--accent); color:#17140f; border-color:var(--accent); } }
+
+  section.category{ padding-top:36px; }
+  .cat-head{ display:flex; align-items:baseline; gap:12px; margin-bottom:6px; }
+  .cat-dot{ width:10px; height:10px; border-radius:50%; flex:none; }
+  .cat-head h2{ font-family:"Fraunces", serif; font-weight:600; font-size:1.4rem; margin:0; }
+  .cat-desc{ color:var(--ink-2); font-size:14.5px; margin:0 0 22px; max-width:62ch; }
+
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    padding:20px 22px; margin-bottom:16px; box-shadow:var(--shadow);
+  }
+  .card-top{ display:flex; align-items:flex-start; gap:12px; margin-bottom:6px; }
+  .idx{ font-family:"IBM Plex Mono", monospace; font-size:13px; color:var(--ink-2); padding-top:3px; flex:none; width:1.8em; }
+  .card h3{ font-family:"Fraunces", serif; font-weight:600; font-size:1.16rem; margin:0 0 4px; line-height:1.25; }
+  .meta{ font-size:13px; color:var(--ink-2); margin:0 0 14px; }
+  .meta .verified{ color:var(--cat-b); font-weight:600; }
+  .resumen{ margin:0 0 14px; }
+  .uso{ border-radius:9px; padding:12px 14px; background:var(--accent-soft); border-left:3px solid var(--accent); margin-bottom:14px; }
+  .uso .label{ font-family:"IBM Plex Mono", monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-deep); display:block; margin-bottom:4px; font-weight:600; }
+  .uso p{ margin:0; font-size:14.5px; }
+  .card-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+  .btn{
+    display:inline-flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600;
+    padding:8px 13px; border-radius:7px; text-decoration:none; border:1px solid var(--line);
+  }
+  .btn.primary{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  :root[data-theme="dark"] .btn.primary{ background:var(--accent); color:#17140f; border-color:var(--accent); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn.primary{ background:var(--accent); color:#17140f; border-color:var(--accent); } }
+  .btn.ghost{ background:var(--surface); color:var(--ink); }
+  .btn.ghost:hover, .btn.primary:hover{ opacity:.85; }
+
+  .card[data-cat="anclas"] .idx{ color:var(--cat-a); }
+  .card[data-cat="voces"] .idx{ color:var(--cat-b); }
+  .card[data-cat="marcos"] .idx{ color:var(--cat-c); }
+  .cat-dot.anclas{ background:var(--cat-a); }
+  .cat-dot.voces{ background:var(--cat-b); }
+  .cat-dot.marcos{ background:var(--cat-c); }
+
+  .empty{ display:none; padding:40px 0; text-align:center; color:var(--ink-2); }
+
+  /* Detail view */
+  .detail{ padding:8px 0 40px; }
+  .detail .eyebrow{ margin-bottom:10px; }
+  .detail h1{ font-size:clamp(1.7rem,5vw,2.3rem); margin-bottom:10px; }
+  .cite-box{
+    background:var(--surface-2); border-radius:9px; padding:14px 16px; margin:18px 0 24px;
+    font-size:14px; color:var(--ink-2); font-family:"IBM Plex Mono", monospace; line-height:1.6;
+  }
+  .detail h2.section-title{ font-family:"Fraunces", serif; font-size:1.15rem; font-weight:600; margin:28px 0 10px; }
+  .conclusiones{ margin:0; padding-left:1.2em; }
+  .conclusiones li{ margin-bottom:10px; }
+  .download-row{ margin-top:28px; padding-top:20px; border-top:1px solid var(--line); }
+
+  footer{ margin:48px 0 40px; padding-top:22px; border-top:1px solid var(--line); font-size:13.5px; color:var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <a class="brand" href="#/"><span class="dot"></span>Mapa de Evidencia</a>
+    <a class="back" id="backLink" href="#/" hidden>← Volver al catálogo</a>
+  </div>
+
+  <div id="home">
+    <header class="hero">
+      <p class="eyebrow">Revisión de literatura · IA y educación terciaria en Bogotá</p>
+      <h1>Mapa de Evidencia</h1>
+      <p class="lede">Catálogo de las 20 fuentes primarias cargadas para el informe sobre cómo la IA va a reconfigurar la demanda de trabajo y la oferta educativa terciaria de Bogotá. Cada fuente tiene su propia ficha con resumen extendido, conclusiones clave y el enlace de descarga.</p>
+      <div class="stats">
+        <span><b>20</b> fuentes cargadas y verificadas</span>
+        <span><b>3</b> categorías</span>
+      </div>
+      <a class="report-link" href="https://claude.ai/code/artifact/8b5d1838-1e09-4749-91a3-6a9c7e0f55d8" target="_blank" rel="noopener">→ Ver el informe completo</a>
+    </header>
+
+    <div class="toolbar">
+      <input id="search" type="text" placeholder="Buscar por autor, institución o palabra clave…" autocomplete="off">
+      <div class="pills" id="pills">
+        <button class="pill" data-filter="all" aria-pressed="true">Todas · 20</button>
+        <button class="pill" data-filter="anclas" aria-pressed="false">Anclas de discusión pública · 9</button>
+        <button class="pill" data-filter="voces" aria-pressed="false">Voces colombianas y latinoamericanas · 4</button>
+        <button class="pill" data-filter="marcos" aria-pressed="false">Marcos de exposición ocupacional · 7</button>
+      </div>
+    </div>
+
+    <div id="listApp"></div>
+    <p class="empty" id="empty">Ninguna fuente coincide con la búsqueda.</p>
+
+    <footer>
+      Las 20 fuentes de este catálogo fueron verificadas contra su documento original antes de citarse en el informe. Tres fuentes adicionales del proyecto (Levy Yeyati, Banco Mundial "Quantifying Jobs Potential", entrevistas de Acemoglu en Fortune y MIT Technology Review) quedan pendientes hasta contar con su PDF.
+    </footer>
+  </div>
+
+  <div id="detailApp" hidden></div>
+</div>
+
+<script>
+(function(){
+  var SOURCES = [
+    {
+      slug: "acemoglu-autor-johnson-pro-worker-ai", cat: "anclas", idx: 1,
+      title: "Building Pro-Worker Artificial Intelligence",
+      authors: "Acemoglu, D., Autor, D., & Johnson, S.", org: "The Hamilton Project, Brookings",
+      date: "feb 2026", doc: null,
+      url: "https://economics.mit.edu/sites/default/files/2026-03/Building%20Pro-Worker%20Artificial%20Intelligence.pdf",
+      resumenCorto: "Marco normativo de tres economistas centrales en el debate para dirigir el desarrollo de la IA hacia la complementariedad humana en lugar de la sustitución automática.",
+      resumenExtendido: "Documento de política (no un paper académico tradicional) publicado por The Hamilton Project de Brookings, firmado por tres de los economistas más influyentes en el debate sobre IA y trabajo: Daron Acemoglu, David Autor y Simon Johnson. Propone un marco normativo concreto —no solo diagnóstico— para que los gobiernos dirijan el desarrollo y la adopción de la IA hacia la complementariedad con el trabajo humano en lugar de la sustitución automática: incentivos fiscales diferenciados según el tipo de automatización, estándares de divulgación sobre el impacto laboral de los sistemas de IA que despliegan las empresas, y mayor inversión pública en la creación de tareas nuevas que compensen las que se automatizan.",
+      conclusiones: [
+        "El desarrollo de la IA no es tecnológicamente inevitable en una sola dirección: la política pública puede inclinar la balanza hacia la complementariedad o hacia la sustitución.",
+        "Recomienda incentivos fiscales que penalicen la automatización pura y premien la IA que aumenta la productividad de los trabajadores existentes.",
+        "Propone estándares de divulgación corporativa sobre el impacto laboral esperado de los sistemas de IA que las empresas adoptan."
+      ],
+      usoBogota: "Insumo directo de las recomendaciones de política de este informe: respalda reconvertir currículos (no solo recortar cupos) en el cuadrante mixto de la Parte I §4 y §7, aplicando la misma lógica de 'dirigir la IA hacia la complementariedad' a la educación terciaria."
+    },
+    {
+      slug: "acemoglu-restrepo-automation-new-tasks", cat: "anclas", idx: 2,
+      title: "Automation and New Tasks",
+      authors: "Acemoglu, D., & Restrepo, P.", org: "Journal of Economic Perspectives",
+      date: "2019", doc: null,
+      url: "https://www.aeaweb.org/articles?id=10.1257%2Fjep.33.2.3",
+      resumenCorto: "Formaliza el 'marco de tareas': la automatización desplaza tareas específicas, no ocupaciones completas, y su efecto neto depende de si se crean tareas nuevas donde el humano conserva ventaja.",
+      resumenExtendido: "Artículo de síntesis en el Journal of Economic Perspectives que formaliza el marco de tareas (task-based framework) que hoy domina la economía laboral de la automatización. Su argumento central: la unidad de análisis correcta no es la ocupación completa sino la tarea individual dentro de ella. La automatización desplaza tareas específicas, pero el efecto neto sobre el empleo depende de si simultáneamente se crean tareas nuevas —generalmente más complejas— donde el trabajo humano conserva ventaja comparativa. Cuando la creación de tareas nuevas no sigue el ritmo de la destrucción de tareas viejas, cae la participación del trabajo en el ingreso nacional.",
+      conclusiones: [
+        "La automatización no elimina ocupaciones completas, elimina tareas específicas dentro de ellas.",
+        "El efecto neto sobre el empleo y los salarios depende del balance entre destrucción de tareas viejas y creación de tareas nuevas.",
+        "Este marco reemplazó al enfoque más simple de 'susceptibilidad ocupacional' de Frey y Osborne (2013) como estándar académico dominante."
+      ],
+      usoBogota: "Fundamento teórico de por qué la Parte I §4 recomienda 'reconvertir el currículo, no el cupo' en el cuadrante de alta exposición-alta complejidad: la exposición técnica sola no predice el destino de una ocupación si el currículo captura las tareas nuevas que la IA genera dentro de ella."
+    },
+    {
+      slug: "acemoglu-restrepo-wage-inequality", cat: "anclas", idx: 3,
+      title: "Tasks, Automation, and the Rise in U.S. Wage Inequality",
+      authors: "Acemoglu, D., & Restrepo, P.", org: "Econometrica",
+      date: "2022", doc: null,
+      url: "https://onlinelibrary.wiley.com/doi/full/10.3982/ECTA19815",
+      resumenCorto: "Estima que 50%-70% del aumento de la desigualdad salarial en EE.UU. desde 1980 se explica por automatización, más que por comercio internacional o cambio técnico neutral.",
+      resumenExtendido: "Extensión empírica del marco de tareas que cuantifica cuánto de la desigualdad salarial observada en EE.UU. desde 1980 se explica por automatización frente a otros factores (comercio internacional, cambio técnico sesgado por habilidad, instituciones laborales). Usa variación entre industrias y regiones en la adopción de tecnologías de automatización (robots, software) para aislar el efecto causal sobre la estructura salarial.",
+      conclusiones: [
+        "Entre 50% y 70% de los cambios en la estructura salarial de EE.UU. desde 1980 se explican por automatización.",
+        "El efecto es más fuerte en la caída relativa de los salarios de trabajadores sin educación universitaria.",
+        "Vincula directamente automatización con desigualdad salarial, más allá del efecto agregado sobre el nivel de empleo."
+      ],
+      usoBogota: "Evidencia de que la automatización sin acompañamiento de política amplía la desigualdad — argumento de fondo para tratar la realineación de oferta educativa terciaria como un tema distributivo, no solo de eficiencia."
+    },
+    {
+      slug: "economist-prepare-ai-jobs-apocalypse", cat: "anclas", idx: 4,
+      title: "Prepare for an AI jobs apocalypse",
+      authors: "The Economist (editorial)", org: null,
+      date: "14 may 2026", doc: null,
+      url: "https://www.economist.com/leaders/2026/05/14/prepare-for-an-ai-jobs-apocalypse",
+      resumenCorto: "Editorial que reconoce que la 'apocalipsis laboral' aún no ha llegado, pero pide construir una red de protección ahora: seguro salarial, impuestos a la renta económica y a la tierra, políticas activas de mercado laboral.",
+      resumenExtendido: "Editorial (no un estudio con metodología propia) que sintetiza el estado del debate hasta mediados de 2026: reconoce que la apocalipsis laboral que muchos anticiparon no ha llegado en la magnitud esperada, pero argumenta que los gobiernos deben construir una red de protección ahora, antes de que el impacto se materialice con más fuerza, en lugar de esperar a tener certeza estadística completa.",
+      conclusiones: [
+        "Propone seguro salarial (wage insurance) para trabajadores desplazados que deben aceptar empleos de menor remuneración.",
+        "Recomienda impuestos a la renta económica y a la tierra como fuente de financiamiento, en lugar de gravar directamente la automatización.",
+        "Pide fortalecer las políticas activas de mercado laboral antes de que la adopción de IA se acelere más."
+      ],
+      usoBogota: "Referencia de tono para el resumen ejecutivo: ilustra que el debate público internacional está dividido entre alarma y cautela, lo que respalda basar las decisiones en datos propios de Bogotá y no en el clima de opinión global."
+    },
+    {
+      slug: "economist-ai-graduates-out-of-work", cat: "anclas", idx: 5,
+      title: "Is AI putting graduates out of work already?",
+      authors: "The Economist", org: null,
+      date: "13 may 2026", doc: null,
+      url: "https://www.economist.com/finance-and-economics/2026/05/13/is-ai-putting-graduates-out-of-work-already",
+      resumenCorto: "Análisis propio de NACE en 13 universidades: empleo de tiempo completo en carreras más expuestas a IA (ciencias de la computación) cayó de ~70% a 55% entre 2022 y 2025; economistas divididos sobre la magnitud.",
+      resumenExtendido: "Análisis periodístico con datos propios: The Economist procesó cifras de la National Association of Colleges and Employers (NACE) de 13 universidades estadounidenses para rastrear la tasa de empleo de tiempo completo de recién graduados por carrera. Contrasta ese hallazgo con dos lecturas académicas en disputa: Erik Brynjolfsson (Stanford) encuentra una caída significativa en el empleo juvenil en ocupaciones expuestas a la IA, mientras que economistas de Google cuestionan la magnitud y la causalidad de ese hallazgo.",
+      conclusiones: [
+        "El empleo de tiempo completo en las carreras más expuestas a la IA (ciencias de la computación) cayó de ~70% a 55% entre 2022 y 2025 en la muestra de NACE.",
+        "Brynjolfsson encuentra una caída de 16% en el empleo juvenil en ocupaciones expuestas a la IA generativa.",
+        "Economistas de Google disputan esa cifra, atribuyendo parte de la caída a factores macroeconómicos generales."
+      ],
+      usoBogota: "Evidencia temprana y directa de que la exposición a la IA ya afecta la empleabilidad de recién graduados por carrera — respalda medir la brecha de empleabilidad por programa que propone la Parte I §6."
+    },
+    {
+      slug: "economist-jobs-apocalypse-postponed", cat: "anclas", idx: 6,
+      title: "The jobs apocalypse is postponed. An AI jobs boom is here",
+      authors: "The Economist", org: null,
+      date: "4 sep 2026", doc: null,
+      url: "https://www.economist.com/finance-and-economics/2026/09/04/the-jobs-apocalypse-is-postponed-an-ai-jobs-boom-is-here",
+      resumenCorto: "162.000 empleos creados en EE.UU. en agosto 2026, desempleo en 4,1%; estima ~1 millón de empleos netos creados por la IA frente a ~200.000 despidos atribuidos a la IA desde 2023.",
+      resumenExtendido: "Artículo de seguimiento, publicado semanas antes de la elaboración de este informe, que actualiza el debate con los datos más recientes de empleo en EE.UU. Argumenta, en un giro respecto al tono de mayo de 2026, que la evidencia agregada más reciente muestra creación neta de empleo atribuible a la IA, no destrucción.",
+      conclusiones: [
+        "162.000 empleos se crearon en EE.UU. en agosto de 2026, con desempleo general en 4,1%.",
+        "La brecha de desempleo juvenil (20-24 años) está cerca de su mínimo histórico.",
+        "Estima ~1 millón de empleos netos creados por la IA en EE.UU., frente a solo ~200.000 despidos atribuidos directamente a la IA desde 2023."
+      ],
+      usoBogota: "Contrapeso necesario en el resumen ejecutivo al tono más alarmista de otras fuentes: evita presentar la automatización como una sentencia inevitable y mantiene el argumento centrado en la realineación de oferta, no en el pánico."
+    },
+    {
+      slug: "brynjolfsson-chandar-chen-canaries", cat: "anclas", idx: 7,
+      title: "Canaries in the Coal Mine? Six Facts about the Recent Employment Effects of AI",
+      authors: "Brynjolfsson, E., Chandar, B., & Chen, R.", org: "Stanford Digital Economy Lab",
+      date: "ago 2026", doc: null,
+      url: "https://digitaleconomy.stanford.edu/publication/canaries-in-the-coal-mine-six-facts-about-the-recent-employment-effects-of-artificial-intelligence/",
+      resumenCorto: "Con datos de nómina (ADP) de millones de trabajadores: sin desplazamiento generalizado, pero brecha de empleo juvenil (22-25 años) en ocupaciones expuestas ampliada a 19% para junio de 2026, concentrada donde la IA sustituye tareas.",
+      resumenExtendido: "El estudio académico más riguroso del grupo de fuentes escépticas: usa datos de nómina de ADP (procesador que cubre a millones de trabajadores estadounidenses, no una encuesta) para medir el efecto real de la IA generativa sobre el empleo desde su adopción masiva. A diferencia de los estudios de exposición ocupacional, que son prospectivos, este mide un efecto ya observado con datos administrativos de alta frecuencia.",
+      conclusiones: [
+        "No encuentra desplazamiento generalizado del empleo a nivel agregado.",
+        "La brecha de empleo juvenil (22-25 años) en ocupaciones expuestas a la IA se amplió a 19% para junio de 2026.",
+        "El efecto está concentrado donde la IA sustituye tareas, no donde las complementa — la misma distinción que organiza la matriz de este informe."
+      ],
+      usoBogota: "El hallazgo más matizado y metodológicamente sólido de la mesa de debate internacional: sustituir vs. complementar es exactamente la distinción que organiza la matriz de la Parte I §4 (cuadrante 'reconvertir' vs. 'contraer')."
+    },
+    {
+      slug: "autor-how-ai-shaping-future-of-work", cat: "anclas", idx: 8,
+      title: "How Is AI Shaping the Future of Work?",
+      authors: "Autor, D.", org: "Issues in Science and Technology",
+      date: "13 ene 2026", doc: null,
+      url: "https://issues.org/david-autor-economist-ai-future-work/",
+      resumenCorto: "El coautor original del enfoque de tareas ofrece una lectura pública menos alarmista que Acemoglu, enfatizando la capacidad histórica de las economías de generar tareas nuevas.",
+      resumenExtendido: "Ensayo del coautor original (junto con Acemoglu) del marco de tareas, que ofrece una lectura pública deliberadamente menos alarmista sobre el mismo cuerpo de evidencia. Autor enfatiza la capacidad histórica de las economías capitalistas de generar categorías de trabajo enteramente nuevas en respuesta a la automatización —como ocurrió con la computación personal y con internet— y argumenta que la pregunta relevante no es si habrá nuevas tareas, sino qué tan rápido y para quién.",
+      conclusiones: [
+        "La historia económica muestra que la automatización generalmente crea tantas o más tareas nuevas de las que destruye, aunque con rezago costoso para los desplazados en el corto plazo.",
+        "El riesgo real no es la ausencia de empleo futuro, sino la velocidad de la transición y la distribución desigual de sus costos.",
+        "Coincide con Acemoglu en el diagnóstico técnico pero difiere en el tono y la urgencia de la respuesta de política."
+      ],
+      usoBogota: "Contrapunto de autoridad equivalente a Acemoglu dentro del mismo marco teórico, usado en el resumen ejecutivo para mostrar que el desacuerdo relevante es entre expertos del mismo campo, no entre expertos y escépticos externos."
+    },
+    {
+      slug: "trammell-korinek-transformative-ai-growth", cat: "anclas", idx: 9,
+      title: "Economic Growth under Transformative AI",
+      authors: "Trammell, P., & Korinek, A.", org: "NBER",
+      date: "oct 2023, rev. abr 2026", doc: null,
+      url: "https://www.nber.org/system/files/working_papers/w31815/w31815.pdf",
+      resumenCorto: "Rama macroeconómica más optimista del debate: modela escenarios de crecimiento bajo IA verdaderamente transformadora, de más largo plazo que los estudios de exposición ocupacional.",
+      resumenExtendido: "Paper macroeconómico teórico (no empírico) que modela escenarios de crecimiento económico bajo el supuesto de una IA verdaderamente transformadora, capaz de sustituir al trabajo humano en la mayoría de las tareas económicamente relevantes, incluida la investigación y el desarrollo tecnológico mismo. Es la rama más optimista y de más largo plazo del debate: en sus escenarios, la IA transformadora podría generar tasas de crecimiento muy superiores a las históricas, con implicaciones distributivas que dependen de cómo se distribuya la propiedad del capital de IA.",
+      conclusiones: [
+        "Bajo escenarios de IA verdaderamente transformadora, el crecimiento económico podría acelerarse muy por encima de las tasas históricas.",
+        "Las implicaciones para el bienestar de los trabajadores dependen críticamente de la distribución de la propiedad del capital de IA, no solo de la tasa de crecimiento agregado.",
+        "El horizonte de análisis es más largo y más especulativo que el de los estudios de exposición ocupacional de corto-mediano plazo."
+      ],
+      usoBogota: "Recuerda que los marcos de exposición ocupacional (Parte I §1) son de corto-mediano plazo; este informe no extiende sus recomendaciones a escenarios de IA transformadora de largo plazo, que exceden su alcance."
+    },
+    {
+      slug: "bid-covid-automatizacion-andina", cat: "voces", idx: 10,
+      title: "COVID-19 y riesgo de automatización en el mercado laboral de los países andinos",
+      authors: "Mejía, L. F., & Pabón, C.", org: "Banco Interamericano de Desarrollo (Depto. de Países Andinos)",
+      date: "sep 2023", doc: "Documento de Discusión IDB-DP-01032",
+      url: "https://publications.iadb.org/es/covid-19-y-riesgo-de-automatizacion-en-el-mercado-laboral-de-los-paises-andinos",
+      resumenCorto: "Con metodología Frey-Osborne aplicada a Bolivia, Colombia, Ecuador y Perú: ~60% de los trabajadores enfrenta alto riesgo de automatización a mediano plazo, más alto entre mujeres y adultos de 29-59 años con secundaria; la pandemia aceleró la automatización de empleos ya vulnerables.",
+      resumenExtendido: "El documento aplica la metodología de probabilidad de computarización de Frey y Osborne (2013) a encuestas de hogares de Bolivia, Colombia, Ecuador y Perú, y la cruza con los sectores más golpeados por los confinamientos de COVID-19 entre 2020 y 2021. El argumento central: la pandemia no creó el riesgo de automatización, lo aceleró — los sectores que ya tenían alta probabilidad de automatización (comercio, manufactura ligera, servicios administrativos) fueron también los que más recurrieron a la automatización como respuesta a las restricciones de aforo y movilidad, dejando una adopción tecnológica que no se revirtió tras la reapertura. Nota de atribución: Luis Fernando Mejía dirige actualmente Fedesarrollo, pero este documento se publicó como Documento de Discusión del BID, no de Fedesarrollo.",
+      conclusiones: [
+        "~60% de los trabajadores de la Comunidad Andina (Bolivia, Colombia, Ecuador, Perú) enfrenta alto riesgo de automatización a mediano plazo.",
+        "El riesgo es mayor entre mujeres y entre adultos de 29 a 59 años con educación secundaria (no universitaria).",
+        "La pandemia aceleró, no originó, la automatización de empleos ya vulnerables.",
+        "Colombia se ubica en el rango medio-alto de riesgo entre los cuatro países andinos analizados."
+      ],
+      usoBogota: "Primera cifra regional específica para Colombia (no solo global) que respalda la urgencia del diagnóstico de la Parte I §1-§2 del informe; conecta la automatización con un choque ya vivido (la pandemia), útil para argumentar que Bogotá no enfrenta un riesgo hipotético sino una dinámica con precedente de aceleración local."
+    },
+    {
+      slug: "rosario-labour-empleo-ia-colombia", cat: "voces", idx: 11,
+      title: "Empleo e Inteligencia Artificial en Colombia: un análisis de exposición, complementariedad y desigualdades ocupacionales",
+      authors: "García-Suaza, A., et al. (10 coautores)", org: "LaboUR – Observatorio Laboral, Universidad del Rosario",
+      date: "dic 2025", doc: null,
+      url: "https://urosario.edu.co/en/node/72111",
+      resumenCorto: "Con la GEIH 2024 y los índices de Felten et al. (2021) y Pizzinelli et al. (2023): 14,7% de los ocupados está en alta exposición-baja complementariedad, 25,8% en alta exposición-alta complementariedad; las mujeres se concentran en alta exposición y más del 90% de los perfiles de baja exposición no tiene educación universitaria.",
+      resumenExtendido: "El estudio empírico colombiano más directamente aplicable a este informe. Los 10 coautores construyen, a partir de la GEIH 2024, una matriz de exposición-complementariedad para el universo ocupacional colombiano, combinando el índice de exposición de Felten et al. (2021) con el índice de complementariedad de Pizzinelli et al. (2023) — es decir, no solo miden qué tan expuesta está una ocupación a la IA, sino si la IA sustituye o complementa sus tareas. Esa doble dimensión es la misma lógica que la Parte I §4 de este informe usa para su propia matriz (exposición × complejidad económica), lo que convierte a este estudio en el paralelo metodológico colombiano más cercano.",
+      conclusiones: [
+        "14,7% de los ocupados colombianos está en alta exposición-baja complementariedad — el grupo más vulnerable, concentrado en soporte administrativo.",
+        "25,8% adicional está en alta exposición-alta complementariedad: tareas que la IA transforma pero no necesariamente elimina.",
+        "Las mujeres están sobrerrepresentadas en alta exposición (51,8%-55,6%); los hombres se concentran en baja exposición (67,8%).",
+        "Más del 90% de los perfiles de baja exposición no tiene educación universitaria — la exposición golpea más a los perfiles educados, replicando el patrón de Felten et al. a nivel internacional."
+      ],
+      usoBogota: "Fuente clave para calibrar la matriz de la Parte I §4 con datos colombianos reales en vez de solo extrapolaciones internacionales; el hallazgo de género y de nivel educativo debe entrar directo en las recomendaciones de cupos."
+    },
+    {
+      slug: "cepal-automatizacion-inclusion-laboral", cat: "voces", idx: 12,
+      title: "Automatización del trabajo y desafíos para la inclusión laboral en América Latina",
+      authors: "Espíndola, E., & Suárez, J. I.", org: "CEPAL, División de Desarrollo Social",
+      date: "2023", doc: "Serie Políticas Sociales, N.° 245",
+      url: "https://repositorio.cepal.org/bitstreams/ecd04748-3a6f-4aef-bf9c-9da57fa90717/download",
+      resumenCorto: "Modelo de machine learning (Random Forest) sobre datos PIAAC y encuestas de hogares de 14 países de ALC: probabilidad media de automatización regional de 0,501; 28,4% de los trabajadores en alto riesgo, más hombres que mujeres; transporte es el sector de mayor riesgo.",
+      resumenExtendido: "A diferencia de los estudios basados en la metodología de tareas de Frey-Osborne o Felten et al., este documento de CEPAL entrena un modelo de aprendizaje automático (Random Forest) directamente sobre datos de habilidades del Programa PIAAC y encuestas de hogares armonizadas de 14 países de América Latina y el Caribe, ajustando el modelo a las condiciones estructurales de la región (alta informalidad, heterogeneidad sectorial) en lugar de aplicar directamente coeficientes calculados para EE.UU. Es uno de los dos únicos marcos de este catálogo calibrados específicamente para economías en desarrollo (el otro es el informe OIT/Banco Mundial).",
+      conclusiones: [
+        "Probabilidad media de automatización regional: 0,501 (escala de 0 a 1).",
+        "28,4% de los trabajadores de la región está en alto riesgo (probabilidad > 0,7).",
+        "El riesgo es mayor en hombres (34,8%) que en mujeres (~20%) — patrón inverso al de los estudios de exposición a IA generativa, porque aquí se mide automatización general (incluida robótica y tareas manuales), no solo trabajo cognitivo/administrativo.",
+        "El sector de mayor riesgo es transporte (0,79); el de menor riesgo es cultura y servicios personales (0,30)."
+      ],
+      usoBogota: "La divergencia de género frente a los estudios de IA generativa es en sí misma útil: muestra que 'automatización' y 'exposición a IA generativa' no son sinónimos, y que Bogotá necesita mirar ambos marcos para no subestimar el riesgo en ocupaciones masculinizadas de transporte y logística."
+    },
+    {
+      slug: "asocapitales-desplazamiento-ia-colombia", cat: "voces", idx: 13,
+      title: "Desplazamiento laboral por inteligencia artificial en las ciudades capitales de Colombia",
+      authors: "Asocapitales", org: "Primer informe territorial del país sobre IA y empleo",
+      date: "jul 2026", doc: null,
+      url: "https://www.asocapitales.co/actualidad/noticias/ciudades-autonomas-y-productivas/asocapitales-presenta-la-primera-medicion",
+      resumenCorto: "Medición propia sobre GEIH (2021-2025) y graduados 2024: 48,1% de ocupados en alta exposición; 43,5% de graduados 2024 salió a campos de alta exposición-baja complementariedad; desplazamiento formal urbano podría llegar a 4-8% hacia 2035.",
+      resumenExtendido: "El primer ejercicio de medición territorial en Colombia que cruza exposición ocupacional a la IA con datos de graduados de educación superior, cubriendo las 32 ciudades capitales del país (con foco en las 23 principales). Construye su propio índice de exposición-complementariedad aplicado a microdatos de la GEIH entre 2021 y 2025, y lo cruza con registros administrativos de graduados de 2024 — no solo estima cuántos empleos actuales están expuestos, sino cuántos graduados recientes están siendo formados hacia ocupaciones de alto riesgo. Es la fuente individual más importante del catálogo para el argumento de este informe, porque llega hasta 'qué está produciendo hoy el sistema educativo' y no se queda solo en el diagnóstico del empleo existente.",
+      conclusiones: [
+        "48,1% de los ocupados de las 23 principales ciudades colombianas trabaja en ocupaciones de alta exposición a la IA.",
+        "26,1% (3,27 millones de personas) está en el subgrupo más vulnerable: alta exposición y baja complementariedad.",
+        "43,5% de los graduados de educación superior de 2024 (199.447 personas) salió directo hacia campos de alta exposición-baja complementariedad.",
+        "Sin intervención, el desplazamiento del empleo formal urbano podría llegar a entre 4% y 8% hacia 2035."
+      ],
+      usoBogota: "Hace el puente directo entre 'exposición ocupacional' y 'oferta educativa' — el mismo puente que es la tesis central de este informe — y por eso ancla las cifras del resumen ejecutivo y de la Parte I §2 y §5."
+    },
+    {
+      slug: "frey-osborne-future-of-employment", cat: "marcos", idx: 14,
+      title: "The Future of Employment: How Susceptible Are Jobs to Computerisation?",
+      authors: "Frey, C. B., & Osborne, M. A.", org: "Oxford Martin School, University of Oxford",
+      date: "2013", doc: null,
+      url: "https://oms-www.files.svdcdn.com/production/downloads/academic/The_Future_of_Employment.pdf",
+      resumenCorto: "Estudio fundacional del campo: un clasificador de proceso Gaussiano sobre 702 ocupaciones de EE.UU. estima que ~47% del empleo total está en riesgo de computarización. Anterior a la IA generativa.",
+      resumenExtendido: "El estudio fundacional del campo de 'exposición ocupacional a la automatización'. Frey y Osborne entrenaron un clasificador de proceso Gaussiano usando un panel de expertos en aprendizaje automático que calificó manualmente 70 ocupaciones según su susceptibilidad a la computarización, y extrapolaron ese modelo a las 702 ocupaciones de la clasificación O*NET de EE.UU., usando nueve variables de tareas (percepción y manipulación fina, inteligencia creativa, inteligencia social) como 'cuellos de botella de ingeniería'. Es anterior a la IA generativa: mide susceptibilidad a la automatización de software y robótica de la década de 2010, no a los modelos de lenguaje actuales — por eso estudios posteriores (como Felten et al.) construyeron índices separados específicamente para IA generativa.",
+      conclusiones: [
+        "~47% del empleo total de EE.UU. estaba, según el modelo, en riesgo alto de computarización en un horizonte de 'una década o dos' (proyección de 2013).",
+        "Las ocupaciones de menor riesgo eran las que requerían percepción y manipulación fina, inteligencia creativa o inteligencia social.",
+        "El estudio no distingue automatización total de automatización parcial de tareas — limitación que corrigieron marcos posteriores basados en tareas (Acemoglu-Restrepo, Felten et al.)."
+      ],
+      usoBogota: "Se cita como antecedente histórico y punto de comparación metodológico, no como cifra a proyectar directamente sobre Bogotá — su valor es mostrar cuánto ha evolucionado el campo hasta los marcos ajustados a IA generativa y a economías en desarrollo que sí se usan en la Parte I."
+    },
+    {
+      slug: "felten-raj-seamans-generative-ai-exposure", cat: "marcos", idx: 15,
+      title: "Occupational Heterogeneity in Exposure to Generative AI",
+      authors: "Felten, E., Raj, M., & Seamans, R.", org: "SSRN Working Paper",
+      date: "2023", doc: null,
+      url: "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4414065",
+      resumenCorto: "Adapta el índice AIOE de los mismos autores específicamente a IA generativa; encuentra que las ocupaciones más expuestas son las de mayor educación, salario y perfil profesional — el patrón se invierte respecto a la automatización clásica.",
+      resumenExtendido: "Los mismos autores habían construido en 2021 un índice general de exposición a la IA (AIOE); aquí lo adaptan específicamente para medir exposición a la IA generativa —modelos de lenguaje y de generación de imágenes—, cruzando las capacidades documentadas de esos modelos con las descripciones de tareas de la base O*NET. El hallazgo más citado, y el que más se repite en la literatura posterior (incluido el estudio colombiano de García-Suaza et al.), es que el patrón de exposición se invierte respecto a la automatización clásica: no son las ocupaciones manuales y de baja calificación las más expuestas, sino las profesionales, educadas y bien remuneradas.",
+      conclusiones: [
+        "Las ocupaciones más expuestas a IA generativa son las de mayor nivel educativo, mayor salario y mayor componente de 'trabajo de escritorio'.",
+        "La exposición se correlaciona positivamente con la representación de mujeres, personas blancas y asiáticas en la ocupación.",
+        "La exposición se correlaciona negativamente con la representación de hombres, personas negras e hispanas.",
+        "El índice resultante se convirtió en la base metodológica de estudios regionales posteriores, incluido el de la Universidad del Rosario para Colombia."
+      ],
+      usoBogota: "Es el eslabón metodológico entre la literatura internacional y el estudio colombiano de García-Suaza et al. — entender este paper es necesario para entender de dónde sale la matriz de exposición que se usa en la Parte I §1 y §4."
+    },
+    {
+      slug: "oit-wp140-generative-ai-jobs", cat: "marcos", idx: 16,
+      title: "Generative AI and Jobs: A Refined Global Index",
+      authors: "Gmyrek, P., Berg, J., Kamiński, M., et al.", org: "Organización Internacional del Trabajo, con NASK (Polonia)",
+      date: "2025", doc: "Working Paper 140",
+      url: "https://webapps.ilo.org/static/english/intserv/working-papers/wp140/index.html",
+      resumenCorto: "Actualiza el índice global de la OIT con clasificación de 6 dígitos y encuesta a 1.640 trabajadores: 1 de cada 4 trabajadores globales está en una ocupación expuesta a IA generativa, con brecha de género e ingreso marcadas.",
+      resumenExtendido: "Segunda versión del índice global de exposición a IA generativa de la OIT (la primera fue en 2023), refinada con una clasificación ocupacional polaca de seis dígitos —mucho más granular que la de cuatro dígitos original— y validada con una encuesta directa a 1.640 trabajadores sobre qué tan bien la IA generativa podría realmente desempeñar sus tareas actuales. Esa validación empírica con trabajadores reales, no solo con evaluaciones de expertos, es lo que distingue a este índice y lo hace, junto con 'Buffer or Bottleneck', la base metodológica más defendible para este informe.",
+      conclusiones: [
+        "1 de cada 4 trabajadores en el mundo está en una ocupación con algún grado de exposición a la IA generativa.",
+        "Solo 3,3% está en la categoría de 'exposición muy alta'.",
+        "Brecha de género en la categoría de mayor exposición: 4,7% de las mujeres frente a 2,4% de los hombres, por la sobrerrepresentación femenina en trabajo administrativo.",
+        "La exposición es mucho mayor en países de altos ingresos (34% del empleo) que en países de bajos ingresos (11%)."
+      ],
+      usoBogota: "La brecha entre países de altos y bajos ingresos es clave para no importar sin ajuste los porcentajes calculados para EE.UU. o Europa — Bogotá, como economía de ingreso medio, se ubica en un punto intermedio que este informe estima con el marco OIT/Banco Mundial."
+    },
+    {
+      slug: "oit-bm-wp121-buffer-or-bottleneck", cat: "marcos", idx: 17,
+      title: "Buffer or Bottleneck? Employment Exposure to Generative AI and the Digital Divide in Latin America",
+      authors: "Gmyrek, P., Winkler, H., & Garganta, S.", org: "Organización Internacional del Trabajo / Banco Mundial",
+      date: "2024", doc: "Working Paper 121",
+      url: "https://webapps.ilo.org/static/english/intserv/working-papers/wp121/index.html",
+      resumenCorto: "Único marco diseñado para ALC: 30%-40% del empleo regional está expuesto a IA generativa, pero casi la mitad de los puestos que podrían beneficiarse están limitados por la brecha digital.",
+      resumenExtendido: "El único documento del catálogo diseñado específicamente para América Latina y el Caribe, y el que más directamente informa la adaptación regional del marco de exposición ocupacional que usa este informe (Parte I §1). Su argumento central: la brecha digital no es un problema aparte de la exposición a la IA, sino que la determina — un trabajo puede tener alta exposición técnica a la IA generativa, pero si quien lo ocupa no tiene acceso regular a computador e internet en su lugar de trabajo, esa exposición técnica no se traduce en un riesgo (ni en una oportunidad) real a corto plazo. De ahí el título: la brecha digital puede actuar como 'amortiguador' o como 'cuello de botella'.",
+      conclusiones: [
+        "Entre 30% y 40% del empleo de América Latina y el Caribe está expuesto de alguna forma a la IA generativa.",
+        "Solo 2%-5% está en riesgo de automatización directa; 8%-12% tiene potencial de aumento productivo (complementariedad).",
+        "Casi la mitad de los puestos que técnicamente podrían beneficiarse de la IA generativa están limitados por la brecha digital.",
+        "Esa brecha afecta de forma similar a hombres y mujeres (~6,2% en ambos casos)."
+      ],
+      usoBogota: "El marco más citado en la Parte I §1-§2 de este informe: es el único calibrado para una economía en desarrollo con informalidad y brecha digital significativas — indispensable antes de aplicar cualquier porcentaje calculado para EE.UU. o Europa a la realidad bogotana."
+    },
+    {
+      slug: "mckinsey-agents-robots-us", cat: "marcos", idx: 18,
+      title: "Agents, robots, and us: How AI reshapes work and skills in Latin America",
+      authors: "McKinsey Global Institute", org: null,
+      date: "jul 2026", doc: null,
+      url: "https://www.mckinsey.com/mgi/our-research/agents-robots-and-us-how-ai-reshapes-work-and-skills-in-latin-america",
+      resumenCorto: "Combina IA generativa, robótica física y automatización de procesos: 57% de las horas de trabajo actuales en América Latina son técnicamente automatizables; incluye panel específico para Colombia.",
+      resumenExtendido: "A diferencia de los estudios anteriores, que miden sobre todo IA generativa basada en modelos de lenguaje, este informe combina en un solo marco tres tecnologías distintas —agentes de IA generativa, robótica física y automatización de procesos— y estima su efecto combinado sobre las horas de trabajo actuales en América Latina. Incluye un panel de datos específico para Colombia, una de solo cinco economías de la región con un 'dashboard' propio dentro del estudio.",
+      conclusiones: [
+        "57% de las horas de trabajo actuales en América Latina son técnicamente automatizables con tecnologías ya existentes.",
+        "La automatización podría liberar ~US$450.000 millones en valor económico anual hacia 2030 en la región.",
+        "66% de las habilidades demandadas hoy se usan tanto en trabajo automatizable como no automatizable.",
+        "La demanda de fluidez en herramientas de IA creció 11 veces en dos años en América Latina — el doble que en EE.UU./Europa.",
+        "Colombia cuenta con panel de datos propio dentro del estudio."
+      ],
+      usoBogota: "Fuente de las cifras headline del resumen ejecutivo (57% de horas automatizables, US$450.000 millones), precisamente porque combina los tres tipos de automatización que la tesis central del informe insiste en tratar juntos, e incluye a Colombia de forma explícita."
+    },
+    {
+      slug: "bid-futuro-trabajo-lac-robots-nota7", cat: "marcos", idx: 19,
+      title: "El futuro del trabajo en América Latina y el Caribe: ¿Cuál es el impacto de la automatización en el empleo y los salarios?",
+      authors: "Ripani, L., Soler, N. (BID); Kugler, A., Kugler, M., & Rodrigo, R.", org: "Banco Interamericano de Desarrollo",
+      date: "2020", doc: "Nota N.° 7 de la serie \"El futuro del trabajo en América Latina y el Caribe\"",
+      url: "https://publications.iadb.org/en/future-work-latin-america-and-caribbean-what-impact-automation-employment-and-wages",
+      resumenCorto: "Único estudio del catálogo que mide un efecto ya ocurrido: la adopción de robots en EE.UU. (2011-2016) afectó negativamente el empleo y los salarios en Colombia y Brasil, y benefició a México.",
+      resumenExtendido: "A diferencia de casi todos los demás documentos del catálogo, que proyectan riesgos futuros, este estudio del BID mide un efecto ya ocurrido: usa la adopción real de robots industriales en Estados Unidos entre 2011 y 2016 como un choque exógeno y estima su efecto de contagio sobre el empleo y los salarios en países de América Latina proveedores o competidores de esas cadenas de manufactura. Es la única fuente del catálogo que documenta un efecto de automatización sobre Colombia con datos observados, no con un modelo de riesgo proyectado.",
+      conclusiones: [
+        "La adopción de robots industriales en EE.UU. entre 2011 y 2016 afectó negativamente el empleo y los salarios en Colombia y Brasil.",
+        "México, más integrado a las cadenas de manufactura estadounidenses, tuvo el efecto contrario: su empleo aumentó con la misma ola de adopción de robots.",
+        "Los más afectados dentro de los países perjudicados fueron las firmas pequeñas, los trabajadores de mayor edad y las mujeres.",
+        "El Gini promedio de ingresos en ALC (0,46) casi duplica el de los países desarrollados (0,32)."
+      ],
+      usoBogota: "El ancla empírica de la tesis central de este informe: la prueba de que la automatización —sin necesidad de IA generativa— ya afectó negativamente a Colombia una vez, con canales de transmisión que el marco de complejidad económica de la Parte I §3 intenta anticipar hacia adelante."
+    },
+    {
+      slug: "wef-future-of-jobs-2025", cat: "marcos", idx: 20,
+      title: "Future of Jobs Report 2025",
+      authors: "Foro Económico Mundial", org: null,
+      date: "2025", doc: null,
+      url: "https://www.weforum.org/publications/the-future-of-jobs-report-2025/",
+      resumenCorto: "Encuesta a más de 1.000 empleadores globales (55 economías): proyecta 78 millones de empleos netos hacia 2030 y que 39% de las habilidades laborales se transformarán o quedarán obsoletas.",
+      resumenExtendido: "El informe insignia del Foro Económico Mundial sobre el futuro del empleo, basado en una encuesta directa a más de 1.000 empleadores globales que en conjunto representan a más de 14 millones de trabajadores en 55 economías. A diferencia de los estudios técnicos de exposición ocupacional, este informe pregunta directamente a quienes toman decisiones de contratación qué esperan que pase con sus plantillas — una medida de expectativa empresarial más que de exposición técnica, y por eso un buen contrapeso a los marcos más técnicos del resto del catálogo.",
+      conclusiones: [
+        "Los empleadores proyectan la creación de 170 millones de empleos y el desplazamiento de 92 millones hacia 2030 (crecimiento neto de 78 millones, +7% del empleo total).",
+        "39% de las habilidades laborales actuales se transformarán o quedarán obsoletas entre 2025 y 2030.",
+        "La IA y el análisis de macrodatos encabezan la lista de habilidades de más rápido crecimiento.",
+        "Es la encuesta empresarial de mayor escala del catálogo, aunque mide expectativas declaradas, no exposición técnica medida de forma independiente."
+      ],
+      usoBogota: "Fuente de la cifra más citada del resumen ejecutivo (78 millones de empleos netos, 39% de habilidades transformadas) — marco de referencia global contra el cual contrastar los hallazgos, más modestos en magnitud pero más específicos, de las fuentes colombianas y regionales."
+    }
+  ];
+
+  var CAT_LABEL = { anclas: "Anclas de discusión pública", voces: "Voces colombianas y latinoamericanas", marcos: "Marcos de exposición ocupacional" };
+  var CAT_DESC = {
+    anclas: "El debate económico internacional de más alto perfil sobre IA y empleo — el marco frente al cual este informe se posiciona.",
+    voces: "Estudios con datos propios de Colombia o de la región — la evidencia que ancla el informe a la realidad de Bogotá.",
+    marcos: "Las metodologías que miden qué tan expuesta está una ocupación a la IA — generativa, robótica o de aprendizaje automático."
+  };
+
+  var homeEl = document.getElementById('home');
+  var listApp = document.getElementById('listApp');
+  var detailApp = document.getElementById('detailApp');
+  var emptyEl = document.getElementById('empty');
+  var backLink = document.getElementById('backLink');
+  var search = document.getElementById('search');
+  var pills = Array.prototype.slice.call(document.querySelectorAll('.pill'));
+  var state = { filter: 'all', query: '' };
+
+  function esc(s){ return (s||'').replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+
+  function renderCard(s){
+    return '' +
+      '<article class="card" data-cat="'+s.cat+'" data-search="'+esc((s.title+' '+s.authors+' '+(s.org||'')).toLowerCase())+'">' +
+        '<div class="card-top"><span class="idx">'+String(s.idx).padStart(2,'0')+'</span><div>' +
+          '<h3><a href="#/fuente/'+s.slug+'">'+esc(s.title)+'</a></h3>' +
+          '<p class="meta">'+esc(s.authors)+(s.org?' · '+esc(s.org):'')+' · '+esc(s.date)+' · <span class="verified">✓ verificado</span></p>' +
+        '</div></div>' +
+        '<p class="resumen">'+esc(s.resumenCorto)+'</p>' +
+        '<div class="uso"><span class="label">Uso en Bogotá</span><p>'+esc(s.usoBogota)+'</p></div>' +
+        '<div class="card-actions">' +
+          '<a class="btn primary" href="#/fuente/'+s.slug+'">Ver ficha completa →</a>' +
+          '<a class="btn ghost" href="'+s.url+'" target="_blank" rel="noopener">Descargar fuente ↗</a>' +
+        '</div>' +
+      '</article>';
+  }
+
+  function renderList(){
+    var q = state.query.trim().toLowerCase();
+    var cats = ['anclas','voces','marcos'];
+    var html = '';
+    var visible = 0;
+    cats.forEach(function(cat){
+      if(state.filter !== 'all' && state.filter !== cat) return;
+      var items = SOURCES.filter(function(s){ return s.cat === cat; });
+      var filtered = items.filter(function(s){
+        return !q || (s.title+' '+s.authors+' '+(s.org||'')+' '+s.resumenCorto).toLowerCase().indexOf(q) !== -1;
+      });
+      if(filtered.length === 0) return;
+      visible += filtered.length;
+      html += '<section class="category" id="'+cat+'"><div class="cat-head"><span class="cat-dot '+cat+'"></span><h2>'+CAT_LABEL[cat]+'</h2></div>';
+      html += '<p class="cat-desc">'+CAT_DESC[cat]+'</p>';
+      filtered.forEach(function(s){ html += renderCard(s); });
+      html += '</section>';
+    });
+    listApp.innerHTML = html;
+    emptyEl.style.display = visible === 0 ? 'block' : 'none';
+  }
+
+  function renderDetail(slug){
+    var s = SOURCES.filter(function(x){ return x.slug === slug; })[0];
+    if(!s){
+      detailApp.innerHTML = '<div class="detail"><p>Esta fuente no existe todavía en el catálogo. <a href="#/">Volver.</a></p></div>';
+      return;
+    }
+    var yearMatch = s.date.match(/\d{4}/);
+    var cite = esc(s.authors) + '. (' + (yearMatch ? yearMatch[0] : esc(s.date)) + '). <em>' + esc(s.title) + '</em>' +
+      (s.doc ? ' (' + esc(s.doc) + ')' : '') + (s.org ? '. ' + esc(s.org) + '.' : '.');
+    var conclusiones = s.conclusiones.map(function(c){ return '<li>'+esc(c)+'</li>'; }).join('');
+    detailApp.innerHTML =
+      '<div class="detail">' +
+        '<p class="eyebrow">'+CAT_LABEL[s.cat]+'</p>' +
+        '<h1>'+esc(s.title)+'</h1>' +
+        '<p class="meta">'+esc(s.authors)+(s.org?' · '+esc(s.org):'')+' · '+esc(s.date)+' · <span class="verified">✓ verificado</span></p>' +
+        '<div class="cite-box">'+cite+'</div>' +
+        '<h2 class="section-title">Resumen extendido</h2>' +
+        '<p>'+esc(s.resumenExtendido)+'</p>' +
+        '<h2 class="section-title">Conclusiones clave</h2>' +
+        '<ul class="conclusiones">'+conclusiones+'</ul>' +
+        '<h2 class="section-title">Uso en el análisis de Bogotá</h2>' +
+        '<div class="uso"><p>'+esc(s.usoBogota)+'</p></div>' +
+        '<div class="download-row">' +
+          '<a class="btn primary" href="'+s.url+'" target="_blank" rel="noopener">Descargar / ver fuente original ↗</a>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function route(){
+    var hash = location.hash || '#/';
+    var m = hash.match(/^#\/fuente\/([a-z0-9-]+)/);
+    if(m){
+      homeEl.hidden = true; detailApp.hidden = false; backLink.hidden = false;
+      renderDetail(m[1]);
+      window.scrollTo(0,0);
+    } else {
+      homeEl.hidden = false; detailApp.hidden = true; backLink.hidden = true;
+      renderList();
+    }
+  }
+
+  pills.forEach(function(pill){
+    pill.addEventListener('click', function(){
+      pills.forEach(function(p){ p.setAttribute('aria-pressed','false'); });
+      pill.setAttribute('aria-pressed','true');
+      state.filter = pill.getAttribute('data-filter');
+      renderList();
+    });
+  });
+  search.addEventListener('input', function(){ state.query = search.value; renderList(); });
+
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
